@@ -14,7 +14,7 @@ class FHIRLoader(object):
     """
     needs = {
         'version.info': 'version.info',
-        'profiles-resources.json': 'examples-json.zip',
+        'profiles-resources.json': 'definitions.json.zip',
     }
     
     def __init__(self, settings):

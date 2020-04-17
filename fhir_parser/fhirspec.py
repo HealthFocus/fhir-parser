@@ -1006,7 +1006,7 @@ class FHIRElementType(object):
         if ext_type is not None:
             fhir_ext = [e for e in ext_type if e.get('url') == 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type']
             if len(fhir_ext) == 1:      # This may hit after R4
-                self.code = fhir_ext[0].get('valueUri')
+                self.code = fhir_ext[0].get('valueUrl')
         
         # This may hit on R4 or earlier
         ext_code = type_dict.get('_code')
