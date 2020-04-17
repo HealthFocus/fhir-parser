@@ -11,7 +11,7 @@ import datetime
 from .logger import logger
 from .fhirclass import FHIRClass, FHIRClassProperty
 from .fhirunittest import FHIRUnitTestController
-from .fhirrenderer import FHIRUnitTestRenderer
+from .fhirrenderer import FHIRUnitTestRenderer, FHIRStructureDefinitionRenderer, FHIRValueSetRenderer, FHIRFactoryRenderer, FHIRDependencyRenderer
 
 # allow to skip some profiles by matching against their url (used while WiP)
 skip_because_unsupported = [
@@ -258,18 +258,18 @@ class FHIRSpec(object):
     
     def write(self):
         if self.settings.write_resources:
-            renderer = fhirrenderer.FHIRStructureDefinitionRenderer(self, self.settings)
+            renderer = FHIRStructureDefinitionRenderer(self, self.settings)
             renderer.render()
             
-            vsrenderer = fhirrenderer.FHIRValueSetRenderer(self, self.settings)
+            vsrenderer = FHIRValueSetRenderer(self, self.settings)
             vsrenderer.render()
         
         if self.settings.write_factory:
-            renderer = fhirrenderer.FHIRFactoryRenderer(self, self.settings)
+            renderer = FHIRFactoryRenderer(self, self.settings)
             renderer.render()
         
         if self.settings.write_dependencies:
-            renderer = fhirrenderer.FHIRDependencyRenderer(self, self.settings)
+            renderer = FHIRDependencyRenderer(self, self.settings)
             renderer.render()
         
         if self.settings.write_unittests:
