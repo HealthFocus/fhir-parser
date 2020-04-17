@@ -8,11 +8,13 @@
 #  Supply "-l" to only download the spec
 
 import sys
+from fhir_parser import fhirloader
+from fhir_parser import fhirspec
 
-import settings
-import fhirloader
-import fhirspec
-
+try:
+    import settings
+except:
+    from Default import settings
 
 if '__main__' == __name__:
     force_download = len(sys.argv) > 1 and '-f' in sys.argv

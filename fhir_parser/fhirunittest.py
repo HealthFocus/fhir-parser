@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import io
-import re
 import sys
 import glob
 import json
 import os.path
 
-from logger import logger
-import fhirclass
+from .logger import logger
+from .fhirclass import FHIRClass
 
 
 class FHIRUnitTestController(object):
@@ -54,7 +53,7 @@ class FHIRUnitTestController(object):
         assert classname
         if classname in self.settings.classmap:
             classname = self.settings.classmap[classname]
-        klass = fhirclass.FHIRClass.with_name(classname)
+        klass = FHIRClass.with_name(classname)
         if klass is None:
             logger.error('There is no class for "{}", cannot create unit tests'
                 .format(classname))
@@ -115,7 +114,7 @@ class FHIRUnitTest(object):
                 logger.warning('Unknown property "{}" in unit test on {} in {}'
                     .format(path, self.klass.name, self.filepath))
             else:
-                propclass = fhirclass.FHIRClass.with_name(prop.class_name)
+                propclass = FHIRClass.with_name(prop.class_name)
                 if propclass is None:
                     path = "{}.{}".format(self.prefix, prop.name) if self.prefix else prop.name
                     logger.error('There is no class "{}" for property "{}" in {}'

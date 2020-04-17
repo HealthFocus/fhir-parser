@@ -5,14 +5,13 @@ import io
 import os
 import re
 import sys
-import glob
 import json
 import datetime
 
-from logger import logger
-import fhirclass
-import fhirunittest
-import fhirrenderer
+from .logger import logger
+from .fhirclass import FHIRClass, FHIRClassProperty
+from .fhirunittest import FHIRUnitTestController
+from .fhirrenderer import FHIRUnitTestRenderer
 
 # allow to skip some profiles by matching against their url (used while WiP)
 skip_because_unsupported = [
@@ -241,7 +240,7 @@ class FHIRSpec(object):
     # MARK: Unit Tests
     
     def parse_unit_tests(self):
-        controller = fhirunittest.FHIRUnitTestController(self)
+        controller = FHIRUnitTestController(self)
         controller.find_and_parse_tests(self.directory)
         self.unit_tests = controller.collections
     
@@ -275,7 +274,7 @@ class FHIRSpec(object):
         
         if self.settings.write_unittests:
             self.parse_unit_tests()
-            renderer = fhirrenderer.FHIRUnitTestRenderer(self, self.settings)
+            renderer = FHIRUnitTestRenderer(self, self.settings)
             renderer.render()
 
 
@@ -600,7 +599,7 @@ class FHIRStructureDefinition(object):
             for prop in klass.properties:
                 prop_cls_name = prop.class_name
                 if prop.enum is not None:
-                    enum_cls, did_create = fhirclass.FHIRClass.for_element(prop.enum)
+                    enum_cls, did_create = FHIRClass.for_element(prop.enum)
                     enum_cls.module = prop.enum.name
                     prop.module_name = enum_cls.module
                     if not enum_cls.name in needed:
@@ -608,7 +607,7 @@ class FHIRStructureDefinition(object):
                         needs.append(enum_cls)
                 
                 elif prop_cls_name not in internal and not self.spec.class_name_is_native(prop_cls_name):
-                    prop_cls = fhirclass.FHIRClass.with_name(prop_cls_name)
+                    prop_cls = FHIRClass.with_name(prop_cls_name)
                     if prop_cls is None:
                         raise Exception('There is no class "{}" for property "{}" on "{}" in {}'.format(prop_cls_name, prop.name, klass.name, self.name))
                     else:
@@ -658,7 +657,7 @@ class FHIRStructureDefinition(object):
         # assign all super-classes as objects
         for cls in self.classes:
             if cls.superclass is None:
-                super_cls = fhirclass.FHIRClass.with_name(cls.superclass_name)
+                super_cls = FHIRClass.with_name(cls.superclass_name)
                 if super_cls is None and cls.superclass_name is not None:
                     raise Exception('There is no class implementation for class named "{}" in profile "{}"'
                         .format(cls.superclass_name, self.url))
@@ -777,7 +776,7 @@ class FHIRStructureDefinitionElement(object):
             return None, None
         
         subs = []
-        cls, did_create = fhirclass.FHIRClass.for_element(self)
+        cls, did_create = FHIRClass.for_element(self)
         if did_create:  # manual_profiles
             if module is None:
                 if self.profile.manual_module is not None:
@@ -833,15 +832,15 @@ class FHIRStructureDefinitionElement(object):
                 
                 # an inline class
                 if 'BackboneElement' == type_obj.code or 'Element' == type_obj.code:        # data types don't use "BackboneElement"
-                    props.append(fhirclass.FHIRClassProperty(self, type_obj, self.name_if_class))
+                    props.append(FHIRClassProperty(self, type_obj, self.name_if_class))
                     # TODO: look at http://hl7.org/fhir/StructureDefinition/structuredefinition-explicit-type-name ?
                 else:
-                    props.append(fhirclass.FHIRClassProperty(self, type_obj))
+                    props.append(FHIRClassProperty(self, type_obj))
             return props
         
         # no `type` definition in the element: it's a property with an inline class definition
         type_obj = FHIRElementType()
-        return [fhirclass.FHIRClassProperty(self, type_obj, self.name_if_class)]
+        return [FHIRClassProperty(self, type_obj, self.name_if_class)]
     
     
     # MARK: Name Utils

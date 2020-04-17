@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from logger import logger
-
+from .logger import logger
 
 class FHIRClass(object):
     """ An element/resource that should become its own class.
